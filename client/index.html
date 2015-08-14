@@ -7,32 +7,71 @@
 		<script src="js/app.js"></script>
 	</head>
 
-	<body>
+	<body role="document">
 		<nav class="navbar navbar-inverse navbar-fixed-top">
 			<div class="container">
 				<div class="navbar-collapse collapse" id="navbar">
-					<ul class="nav navbar-nav">
-						<li>
-							<a href="#"><span class="glyphicon glyphicon-plus"></span> Создать канал</a>
-						</li>
-					</ul>
+					
 				</div>
 			</div>
 		</nav>
 
-		<div class="container">
-			<aside>
-				<h4>Каналы:</h4>
-				<ul class="channels">
-				</ul>
-			</aside>
-			<div>
+		<div class="container theme-showcase" role="main">
+			<div class="page-header">
+
 			</div>
-			<aside>
-				<h4>Пользователи:</h4>
-				<ul class="channels">
-				</ul>
-			</aside>
+
+			<div class="row voffset2">
+				<div class="col-md-12">
+					<div class="col-md-6">
+						<ul class='rooms-list'>
+							<li data-value='1'>Value 1</li>
+							
+							<li data-value='2'>Value 2</li>
+
+							<li data-value='3'>Value 3</li>
+
+							<li data-value='4'>Value 4</li>
+						</ul>
+
+						<form class='form-inline' id='form_create_room' role="form">
+							<div class="form-group">
+								<label for="roomname_field">Введите название комнаты:</label>
+								
+								<input type="text" name="room" id="roomname_field" class="form-control" required />
+							</div>
+							
+							<div class="form-group">
+								<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Создать</button>
+							</div>
+						</form>
+					</div>
+
+					<div class="col-md-6">
+						<form id='form_connect_to_room'>
+							<div class='form-group'>
+								<div>
+									<label for="nickname_field">Введите ваш никнейм:</label>		
+
+									<input type="text" name="nickname" id="nickname_field" class="form-control" required />
+								</div>
+
+								<div id='channel_message'>
+									Вы не выбрали канал
+								</div>
+
+								<div>
+									<input type="hidden" name="room" id="room_field" />
+								</div>
+							</div>
+
+							<div class='form-group'>
+								<button type='submit' class='btn btn-success'>Войти</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<footer>
