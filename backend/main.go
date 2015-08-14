@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"model/room"
+	"model/model"
 	"net/http"
 )
 
@@ -21,7 +21,7 @@ func createRoom(rw http.ResponseWriter, req *http.Request) error {
 			sendMessage: make(chan *User)
 		}	
 	} else {
-		http.MethodNotAllowed
+		http.StatusMethodNotAllowed
 	}
 }
 
@@ -32,7 +32,10 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 	http.HandleFunc("/", serveHome)
-	http.Handle("/room/create", createRoom)
+	http.Handle("/user/connect", model.connectUser)
+	http.Handle("/room/create", model.createRoom)
+	http.Handle("/room/connect", model.connectToRoom)
+	http.Handle("/ws/:room/message", model.sendMessage)
 
 	err := http.ListenAndServe(":8081", nil)
 	if err != nil {

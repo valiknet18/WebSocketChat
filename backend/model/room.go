@@ -32,8 +32,20 @@ func (r *Room) leaveFromRoom(user *User) {
 	Rooms[r.name].users--
 }
 
+func (r *Room) run() {
+	for {
+		select {
+			case u: <- r.register:	
+				
+		}
+	}
+}
+
 type Message struct {
 	user *User `json: "User"`
 	text string `json: "message"`
 }
 
+func connectToRoom(rw http.ResponseWriter, req *http.Request) {
+	
+}
