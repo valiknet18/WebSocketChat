@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 )
 
-type Rooms {
-	rooms map[string]Room `json:"rooms"`
+type Rooms struct {
+	rooms map[string]]Room `json:"rooms"`
 	users int32
 }
 
-func (r *Rooms) joinRoom(room *Room) {
+func (r *Rooms) joinRoom(room *Room, hash string) {
 	r.rooms[room.name] = room
 }
 
@@ -20,6 +20,7 @@ type Room struct {
 	register chan *User
 	unregister chan *User
 	broadcast chan *Message
+	roomHash string
 }
 
 func (r *Room) joinToRoom(user *User) {
@@ -52,11 +53,6 @@ func (r *Room) run() {
 	}
 }
 
-type Message struct {
-	user *User `json: "User"`
-	text string `json: "message"`
-}
-
 func connectToRoom(rw http.ResponseWriter, req *http.Request) {
-	
+		
 }

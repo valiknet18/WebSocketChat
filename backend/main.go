@@ -6,6 +6,8 @@ import (
 	"log"
 	"model/model"
 	"net/http"
+	"encoding/base64"
+    "crypto/rand"
 )
 
 var (
@@ -14,14 +16,28 @@ var (
 
 func createRoom(rw http.ResponseWriter, req *http.Request) error {
 	if req.Method == "POST" {
+
+		rb := make([]byte, 32)
+	   _, err := rand.Read(rb)
+
+
+	   if err != nil {
+	      fmt.Println(err)
+	   }
+
+	   rs := base64.URLEncoding.EncodeToString(rb)
+
 		room := &Room{
 			name: req.Form["name"]
 			register: make(chan *User)
 			unregister: make(chan *User)
 			sendMessage: make(chan *User)
+			roomHash: rs
 		}
 
 		go room.run
+
+		rooms.joinRoom(room, rs);
 	} else {
 		http.StatusMethodNotAllowed
 	}
