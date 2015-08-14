@@ -19,7 +19,7 @@ type Room struct {
 	name string `json: "name"`
 	register chan *User
 	unregister chan *User
-	sendMessage chan *User
+	broadcast chan *Message
 }
 
 func (r *Room) joinToRoom(user *User) {
@@ -36,7 +36,18 @@ func (r *Room) run() {
 	for {
 		select {
 			case u: <- r.register:	
-				
+				users[u.nickname] = user
+			case u: <- r.unregister:
+				delete(users, u.nickname)
+			case m: <- r.broadcast:
+				for _, user := range r.users {
+					select {
+						case user.message <- m: 
+						default: 
+							close(user.message)
+							delete(users, user.nickname)
+					}
+				}
 		}
 	}
 }

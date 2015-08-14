@@ -19,14 +19,16 @@ func createRoom(rw http.ResponseWriter, req *http.Request) error {
 			register: make(chan *User)
 			unregister: make(chan *User)
 			sendMessage: make(chan *User)
-		}	
+		}
+
+		go room.run
 	} else {
 		http.StatusMethodNotAllowed
 	}
 }
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
-	
+
 }
 
 func main() {
@@ -35,7 +37,7 @@ func main() {
 	http.Handle("/user/connect", model.connectUser)
 	http.Handle("/room/create", model.createRoom)
 	http.Handle("/room/connect", model.connectToRoom)
-	http.Handle("/ws/:room/message", model.sendMessage)
+	http.Handle("/ws/:room", model.sendMessage)
 
 	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
