@@ -1,0 +1,73 @@
+<!Doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="static/css/app.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+		<script src="static/js/app.js" type="text/javascript"></script>
+	</head>
+
+	<body role="document">
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-collapse collapse" id="navbar">
+					
+				</div>
+			</div>
+		</nav>
+
+		<div class="container theme-showcase" role="main">
+			<div class="page-header">
+
+			</div>
+
+			<div class="row voffset2">
+				<div class="col-md-12">
+					<div class="col-md-6">
+						<ul class='rooms-list'>
+						</ul>
+
+						<form class='form-inline' id='form_create_room' role="form">
+							<div class="form-group">
+								<label for="roomname_field">Введите название комнаты:</label>
+								
+								<input type="text" name="room" id="roomname_field" class="form-control" required />
+							</div>
+							
+							<div class="form-group">
+								<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Создать</button>
+							</div>
+						</form>
+					</div>
+
+					<div class="col-md-6">
+						<form id='form_connect_to_room'>
+							<div class='form-group'>
+								<div>
+									<label for="nickname_field">Введите ваш никнейм:</label>		
+
+									<input type="text" name="nickname" id="nickname_field" class="form-control" required />
+								</div>
+
+								<div id='channel_message'>
+									Вы не выбрали канал
+								</div>
+
+								<div>
+									<input type="hidden" name="room" id="room_field" />
+								</div>
+							</div>
+
+							<div class='form-group'>
+								<button type='submit' class='btn btn-success'>Войти</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<footer>
+		</footer>
+	</body>
+</html>

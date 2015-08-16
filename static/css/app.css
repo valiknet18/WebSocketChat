@@ -1,0 +1,24 @@
+.modal {
+	display: block;
+}
+
+.modal.hide {
+	display: none
+}
+
+.rooms-list {
+	list-style: none;
+	overflow: auto;
+	height: 100px;
+}
+
+.rooms-list > li {
+	padding: 3px;
+	padding-left: 150px;
+	cursor: pointer;
+}
+
+.rooms-list > .active {
+	background-color: #FC0404;
+	color: #ffffff;
+}
