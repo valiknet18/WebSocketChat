@@ -23,15 +23,15 @@ $(document).ready(function () {
 	$.get(host + '/room/get', null, function (data) {
 		result = "";
 
-		if (data.length > 0) {
-			for (room in data) {
-				if (data[room].hash == channel) {
-					result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
-				} else {
-					result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
-				}
-			}	
-		} else {
+		for (room in data) {
+			if (data[room].hash == channel) {
+				result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
+			} else {
+				result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
+			}
+		}	
+
+		if (result == "") {
 			result = "На данный момент не создано ни одного канала"
 		}
 
@@ -41,16 +41,16 @@ $(document).ready(function () {
 	interval = setInterval(function() {
 		$.get(host + '/room/get', null, function (data) {
 			result = "";
+				
+			for (room in data) {
+				if (data[room].hash == channel) {
+					result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
+				} else {
+					result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
+				}
+			}	
 
-			if (data.length > 0) {
-				for (room in data) {
-					if (data[room].hash == channel) {
-						result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
-					} else {
-						result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
-					}
-				}	
-			} else {
+			if (result == "") {
 				result = "На данный момент не создано ни одного канала"
 			}
 

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"crypto/rand"
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 var rooms = make(map[string]*Room)
@@ -64,6 +64,9 @@ func connectToRoom(rw http.ResponseWriter, req *http.Request) {
 
 //TODO fix this =)
 func createRoom(rw http.ResponseWriter, req *http.Request) {
+
+	fmt.Fprint(rw, req)
+
 	if req.Method == "POST" {
 
 		rb := make([]byte, 32)
