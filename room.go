@@ -4,10 +4,17 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/websocket"
+	"log"
 	"net/http"
 )
 
 var rooms = make(map[string]*Room)
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
 
 type Room struct {
 	Users      map[string]*User `json:"users"`
@@ -58,7 +65,35 @@ func getRooms(rw http.ResponseWriter, req *http.Request) {
 }
 
 func connectToRoom(rw http.ResponseWriter, req *http.Request) {
-	req.ParseForm()
+	ws, err := upgrader.Upgrade(rw, req, nil)
+
+	if err != nil {
+		return
+	}
+
+	fmt.Fprint(rw, req.Form)
+
+	_, message, _ := ws.ReadMessage()
+
+	var dat map[string]interface{}
+
+	json.Unmarshal(message, &dat)
+
+	u := &User{nickname: dat["nickname"], ws: ws, message: make(chan string)}
+
+	u.readPump()
+
+	// h.register <- c
+	// go c.writePump()
+	// c.readPump()
+}
+
+func print_binary(s []byte) {
+	fmt.Printf("Received b:")
+	for n := 0; n < len(s); n++ {
+		fmt.Printf("%d,", s[n])
+	}
+	fmt.Printf("\n")
 }
 
 //TODO fix this =)

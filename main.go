@@ -32,7 +32,7 @@ func main() {
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/user/connect", connectUser)
 	http.HandleFunc("/room/create", createRoom)
-	http.HandleFunc("/room/connect", connectToRoom)
+	http.HandleFunc("/room/", connectToRoom)
 	http.HandleFunc("/room/get", getRooms)
 	// http.Handle("/ws/:room", model.sendMessage)
 

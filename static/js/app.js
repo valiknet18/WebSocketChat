@@ -25,11 +25,17 @@ $(document).ready(function () {
 
 		for (room in data) {
 			if (data[room].hash == channel) {
-				result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + ' Количество людей: ' + data[room].users.length + '</li>'
+				result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
 			} else {
-				result += '<li data-value="' + data[room].hash + '">' + data[room].name + ' Количество людей: ' + data[room].users.length + '</li>'	
+				result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
 			}
 		}	
+
+		if (result == "") {
+			result = "На данный момент не создано ни одного канала"
+		}
+
+		$('.rooms-list').html(result);
 
 		if (result == "") {
 			result = "На данный момент не создано ни одного канала"
@@ -56,7 +62,7 @@ $(document).ready(function () {
 
 			$('.rooms-list').html(result);
 		});
-	}, 10000)
+	}, 10000);
 
 	$('#form_create_room').on('submit', function (e) {
 		e.preventDefault()
@@ -87,24 +93,23 @@ $(document).ready(function () {
 	});	
 
 	$('#form_connect_to_room').on('submit', function (e) {
-		e.preventDefault
+		e.preventDefault()
+
+		clearInterval(interval)
 
 		$current = $(this)
 
 		data = $current.serialize();
 
-		$.post( host + "/user/connect", data, function (data) {
-			//Must return json
-		})
+		var ws = new WebSocket('ws://localhost:8081/room/' + room);
 
-		// var ws = new WebSocket('ws://localhost:8081');
+		ws.onopen = function () {
+			ws.send(JSON.stringify({nickname: nickname}))
+			alert(1)
+		}
 
-		// ws.onopen = function () {
-		// 	alert('connected');
-		// }
-
-		// ws.onerror = function () {
-		// 	alert('error');
-		// }	
+		ws.onerror = function () {
+			alert('error');
+		}	
 	});
 })
