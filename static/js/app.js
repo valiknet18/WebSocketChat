@@ -25,9 +25,9 @@ $(document).ready(function () {
 
 		for (room in data) {
 			if (data[room].hash == channel) {
-				result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
+				result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + ' Количество людей: ' + data[room].users.length + '</li>'
 			} else {
-				result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
+				result += '<li data-value="' + data[room].hash + '">' + data[room].name + ' Количество людей: ' + data[room].users.length + '</li>'	
 			}
 		}	
 
@@ -59,16 +59,32 @@ $(document).ready(function () {
 	}, 10000)
 
 	$('#form_create_room').on('submit', function (e) {
-		e.preventDefault
+		e.preventDefault()
 
 		$current = $(this);
 
 		data = $current.serialize();
 
 		$.post( host + "/room/create", data, function (data) {
-			//Must return json
+			result = "";
+				
+			for (room in data) {
+				if (data[room].hash == channel) {
+					result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
+				} else {
+					result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
+				}
+			}	
+
+			if (result == "") {
+				result = "На данный момент не создано ни одного канала"
+			}
+
+			$('.rooms-list').html(result);
+
+			$('#form_create_room #roomname_field').val('')
 		})
-	});
+	});	
 
 	$('#form_connect_to_room').on('submit', function (e) {
 		e.preventDefault

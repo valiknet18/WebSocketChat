@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -59,36 +58,47 @@ func getRooms(rw http.ResponseWriter, req *http.Request) {
 }
 
 func connectToRoom(rw http.ResponseWriter, req *http.Request) {
-
+	req.ParseForm()
 }
 
 //TODO fix this =)
 func createRoom(rw http.ResponseWriter, req *http.Request) {
-
-	fmt.Fprint(rw, req)
+	req.ParseForm()
 
 	if req.Method == "POST" {
 
-		rb := make([]byte, 32)
-		_, err := rand.Read(rb)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		rs := base64.URLEncoding.EncodeToString(rb)
+		rb := randString(20)
 
 		//TODO fix this name
 		room := &Room{
-			Name:       "test",
+			Name:       req.Form["room"][0],
 			Register:   make(chan *User),
 			Unregister: make(chan *User),
 			Broadcast:  make(chan string),
-			RoomHash:   rs,
+			RoomHash:   rb,
 		}
 
 		go room.run()
 
-		rooms[rs] = room
+		rooms[rb] = room
+
+		js, err := json.Marshal(rooms)
+
+		if err != nil {
+			fmt.Fprintf(rw, err.Error(), http.StatusInternalServerError)
+		}
+
+		rw.Header().Set("Content-type", "application/json")
+		rw.Write(js)
 	}
+}
+
+func randString(n int) string {
+	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	var bytes = make([]byte, n)
+	rand.Read(bytes)
+	for i, b := range bytes {
+		bytes[i] = alphanum[b%byte(len(alphanum))]
+	}
+	return string(bytes)
 }
