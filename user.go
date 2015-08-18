@@ -9,7 +9,6 @@ import (
 type User struct {
 	nickname string
 	ws       *websocket.Conn
-	message  chan string
 }
 
 const (

@@ -79,7 +79,7 @@ func connectToRoom(rw http.ResponseWriter, req *http.Request) {
 
 	json.Unmarshal(message, &dat)
 
-	u := &User{nickname: dat["nickname"], ws: ws, message: make(chan string)}
+	u := &User{nickname: dat["nickname"], ws: ws}
 
 	u.readPump()
 
