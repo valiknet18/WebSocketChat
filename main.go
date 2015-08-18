@@ -31,7 +31,6 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/user/connect", model.ConnectUser)
 	http.HandleFunc("/room/create", model.CreateRoom)
 	http.HandleFunc("/room/", model.ConnectToRoom)
 	http.HandleFunc("/room/get", model.GetRooms)

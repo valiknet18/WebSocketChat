@@ -54,7 +54,7 @@ func (r *Room) run() {
 	}
 }
 
-func getRooms(rw http.ResponseWriter, req *http.Request) {
+func GetRooms(rw http.ResponseWriter, req *http.Request) {
 	json, err := json.Marshal(rooms)
 
 	if err != nil {
