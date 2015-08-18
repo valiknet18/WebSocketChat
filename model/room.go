@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"log"
+	// "log"
 	"net/http"
 )
 
@@ -42,12 +42,12 @@ func (r *Room) run() {
 			delete(r.Users, u.nickname)
 		case m := <-r.Broadcast:
 			for _, user := range r.Users {
-				select {
-				case user.message <- m:
-				default:
-					close(user.message)
-					delete(r.Users, user.nickname)
-				}
+				// select {
+				// case user.message <- m:
+				// default:
+				// 	close(user.message)
+				// 	delete(r.Users, user.nickname)
+				// }
 			}
 		}
 	}
@@ -79,9 +79,9 @@ func connectToRoom(rw http.ResponseWriter, req *http.Request) {
 
 	json.Unmarshal(message, &dat)
 
-	u := &User{nickname: dat["nickname"], ws: ws}
+	// u := &User{nickname: dat["nickname"], ws: ws}
 
-	u.readPump()
+	// u.readPump()
 
 	// h.register <- c
 	// go c.writePump()
