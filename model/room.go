@@ -1,58 +1,139 @@
-package model
+package main
 
 import (
+	"crypto/rand"
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/websocket"
+	"log"
+	"net/http"
 )
 
-type Rooms struct {
-	rooms map[string]]Room `json:"rooms"`
-	users int32
-}
+var rooms = make(map[string]*Room)
 
-func (r *Rooms) joinRoom(room *Room, hash string) {
-	r.rooms[room.name] = room
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 }
 
 type Room struct {
-	users    map[string]User `json: "users"`
-	messages map[User]Message `json: "messages"`
-	name string `json: "name"`
-	register chan *User
-	unregister chan *User
-	broadcast chan *Message
-	roomHash string
+	Users      map[string]*User `json:"users"`
+	Name       string           `json:"name"`
+	Register   chan *User       `json:"-"`
+	Unregister chan *User       `json:"-"`
+	Broadcast  chan string      `json:"-"`
+	RoomHash   string           `json:"hash"`
 }
 
 func (r *Room) joinToRoom(user *User) {
-	r.users[user.name] = user
-	Rooms[r.name].users++
+	r.Users[user.nickname] = user
 }
 
 func (r *Room) leaveFromRoom(user *User) {
-	delete(r.users, user.nickname)
-	Rooms[r.name].users--
+	delete(r.Users, user.nickname)
 }
 
 func (r *Room) run() {
 	for {
 		select {
-			case u: <- r.register:	
-				users[u.nickname] = user
-			case u: <- r.unregister:
-				delete(users, u.nickname)
-			case m: <- r.broadcast:
-				for _, user := range r.users {
-					select {
-						case user.message <- m: 
-						default: 
-							close(user.message)
-							delete(users, user.nickname)
-					}
+		case u := <-r.Register:
+			r.Users[u.nickname] = u
+		case u := <-r.Unregister:
+			delete(r.Users, u.nickname)
+		case m := <-r.Broadcast:
+			for _, user := range r.Users {
+				select {
+				case user.message <- m:
+				default:
+					close(user.message)
+					delete(r.Users, user.nickname)
 				}
+			}
 		}
 	}
 }
 
+func getRooms(rw http.ResponseWriter, req *http.Request) {
+	json, err := json.Marshal(rooms)
+
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+
+	rw.Header().Set("Content-type", "application/json")
+	rw.Write(json)
+}
+
 func connectToRoom(rw http.ResponseWriter, req *http.Request) {
-		
+	ws, err := upgrader.Upgrade(rw, req, nil)
+
+	if err != nil {
+		return
+	}
+
+	fmt.Fprint(rw, req.Form)
+
+	_, message, _ := ws.ReadMessage()
+
+	var dat map[string]interface{}
+
+	json.Unmarshal(message, &dat)
+
+	u := &User{nickname: dat["nickname"], ws: ws}
+
+	u.readPump()
+
+	// h.register <- c
+	// go c.writePump()
+	// c.readPump()
+}
+
+func print_binary(s []byte) {
+	fmt.Printf("Received b:")
+	for n := 0; n < len(s); n++ {
+		fmt.Printf("%d,", s[n])
+	}
+	fmt.Printf("\n")
+}
+
+//TODO fix this =)
+func createRoom(rw http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	if req.Method == "POST" {
+
+		rb := randString(20)
+
+		//TODO fix this name
+		room := &Room{
+			Name:       req.Form["room"][0],
+			Register:   make(chan *User),
+			Unregister: make(chan *User),
+			Broadcast:  make(chan string),
+			RoomHash:   rb,
+		}
+
+		go room.run()
+
+		rooms[rb] = room
+
+		js, err := json.Marshal(rooms)
+
+		if err != nil {
+			fmt.Fprintf(rw, err.Error(), http.StatusInternalServerError)
+		}
+
+		rw.Header().Set("Content-type", "application/json")
+		rw.Write(js)
+	}
+}
+
+func randString(n int) string {
+	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	var bytes = make([]byte, n)
+	rand.Read(bytes)
+	for i, b := range bytes {
+		bytes[i] = alphanum[b%byte(len(alphanum))]
+	}
+	return string(bytes)
 }
