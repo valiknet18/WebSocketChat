@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	// "log"
-	"github.com/valiknet18/WebSocketChat/model"
 	"net/http"
 )
 
