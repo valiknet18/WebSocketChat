@@ -40,16 +40,17 @@ func (r *Room) run() {
 			r.Users[u.nickname] = u
 		case u := <-r.Unregister:
 			delete(r.Users, u.nickname)
-		// case m := <-r.Broadcast:
-		// 	for _, user := range r.Users {
-		// 		select {
-		// 		case user.message <- m:
-		// 		default:
-		// 			close(user.message)
-		// 			delete(r.Users, user.nickname)
-		// 		}
-		// 	}
-		// }
+			// case m := <-r.Broadcast:
+			// 	for _, user := range r.Users {
+			// 		select {
+			// 		case user.message <- m:
+			// 		default:
+			// 			close(user.message)
+			// 			delete(r.Users, user.nickname)
+			// 		}
+			// 	}
+			// }
+		}
 	}
 }
 
