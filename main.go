@@ -31,10 +31,10 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/user/connect", model.connectUser)
-	http.HandleFunc("/room/create", createRoom)
-	http.HandleFunc("/room/", connectToRoom)
-	http.HandleFunc("/room/get", getRooms)
+	http.HandleFunc("/user/connect", model.ConnectUser)
+	http.HandleFunc("/room/create", model.CreateRoom)
+	http.HandleFunc("/room/", model.ConnectToRoom)
+	http.HandleFunc("/room/get", model.GetRooms)
 	// http.Handle("/ws/:room", model.sendMessage)
 
 	err := http.ListenAndServe(":8081", nil)

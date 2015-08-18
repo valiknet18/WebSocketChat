@@ -65,7 +65,7 @@ func getRooms(rw http.ResponseWriter, req *http.Request) {
 	rw.Write(json)
 }
 
-func connectToRoom(rw http.ResponseWriter, req *http.Request) {
+func ConnectToRoom(rw http.ResponseWriter, req *http.Request) {
 	ws, err := upgrader.Upgrade(rw, req, nil)
 
 	if err != nil {
@@ -98,7 +98,7 @@ func print_binary(s []byte) {
 }
 
 //TODO fix this =)
-func createRoom(rw http.ResponseWriter, req *http.Request) {
+func CreateRoom(rw http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 
 	if req.Method == "POST" {

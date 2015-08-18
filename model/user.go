@@ -75,10 +75,10 @@ func (u *User) writePump() {
 	// }
 }
 
-func sendMessage(rw http.ResponseWriter, req *http.Request) {
+func SendMessage(rw http.ResponseWriter, req *http.Request) {
 
 }
 
-func connectUser(rw http.ResponseWriter, req *http.Request) {
+func SonnectUser(rw http.ResponseWriter, req *http.Request) {
 
 }
