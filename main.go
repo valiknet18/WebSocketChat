@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/valiknet18/WebSocketChat/model"
 	"log"
 	"net/http"
 	"text/template"
@@ -30,7 +31,7 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/user/connect", connectUser)
+	http.HandleFunc("/user/connect", model.connectUser)
 	http.HandleFunc("/room/create", createRoom)
 	http.HandleFunc("/room/", connectToRoom)
 	http.HandleFunc("/room/get", getRooms)

@@ -1,4 +1,4 @@
-package main
+package model
 
 import (
 	"crypto/rand"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	// "log"
+	"github.com/valiknet18/WebSocketChat/model"
 	"net/http"
 )
 
