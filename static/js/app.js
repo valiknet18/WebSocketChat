@@ -127,46 +127,51 @@ $(document).ready(function () {
 function renderChat() {
 	users = ["user1", "user2"];
 
-	// $.get(host + "/room/users/" + room, nil, function (data) {
-	// 	users = data;
-	// });
+	$.get(host + "/room/users/" + room, null, function (data) {
+		users = data;
+	});
 
-	// $divMain = $('<div>');
+	$divMain = $('<div>');
 
-	// $leftDiv = $('<div>')
-	// $rightDiv = $('<div>')
+	$leftDiv = $('<div>')
+		.addClass('')
+		.appendTo($divMain);
+	$rightDiv = $('<div>')
+		.appendTo($divMain);
 
-	// $ul = $('<ul id="users">');
-
-	// for (key in users) {
-	// 	$li = $('<li>').val(users[key]);
-	// 	$ul.append($li);
-	// }
-
-	// $rightDiv.append($ul);
-
-	// $divMain.append($leftDiv + $rightDiv);
-
-	// console.log($divMain)
-
-	// $('body > .container').append($divMain);
-
-
-	html = '<div class="col-md-12"><div class="page-header"></div>';
-
-	html += "<div class='col-md-8'><div class='col-md-12'></div><div class='col-md-12'><form id='form-send-message'><div><textarea></textarea></div><div><button type='submit' class='btn btn-success'>Отправить</button></div></form></div></div>"
-
-	html += "<div id='users' class='col-md-4'><ul>"
-
-	ul = "";
+	$ul = $('<ul id="users">');
 
 	for (key in users) {
-		ul += '<li>' + users[key] + '</li>';
+		$li = $('<li>').val(users[key]);
+		$ul.append($li);
 	}
 
-	html += ul + "</ul>";
+	$rightDiv.append($ul);
 
-	html += "</div></div>";
+	// $divMain
+	// 	.append($leftDiv)
+	// 	.append($rightDiv);
 
-	$('body > .container').html(html);
+	console.log($divMain)
+
+	$('body > .container').append($divMain);
+
+
+	// html = '<div class="col-md-12"><div class="page-header"></div>';
+
+	// html += "<div class='col-md-8'><div class='col-md-12'></div><div class='col-md-12'><form id='form-send-message'><div><textarea></textarea></div><div><button type='submit' class='btn btn-success'>Отправить</button></div></form></div></div>"
+
+	// html += "<div id='users' class='col-md-4'><ul>"
+
+	// ul = "";
+
+	// for (key in users) {
+	// 	ul += '<li>' + users[key] + '</li>';
+	// }
+
+	// html += ul + "</ul>";
+
+	// html += "</div></div>";
+
+	// $('body > .container').html(html);
 }
