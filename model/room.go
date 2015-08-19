@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
-	// "log"
+	"log"
 	"net/http"
 )
 
@@ -76,13 +76,15 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request) {
 
 	_, message, _ := ws.ReadMessage()
 
-	var dat map[string]interface{}
+	var dat map[string]string
 
 	json.Unmarshal(message, &dat)
 
-	// u := &User{nickname: dat["nickname"], ws: ws}
+	log.Println(dat["nickname"])
 
-	// u.readPump()
+	u := &User{nickname: dat["nickname"], ws: ws}
+
+	u.readPump()
 
 	// h.register <- c
 	// go c.writePump()

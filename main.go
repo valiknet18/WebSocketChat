@@ -21,6 +21,12 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.URL.Path == "/static/templates/chat.html" {
+		http.ServeFile(w, r, "static/templates/chat.html")
+
+		return
+	}
+
 	homeTempl := template.Must(template.ParseFiles("static/index.html"))
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

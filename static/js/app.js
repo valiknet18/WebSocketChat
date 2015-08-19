@@ -1,6 +1,6 @@
 var nickname = "v1per14";
 var channel = "";
-var host = "http://localhost:8081"
+var host = "http://localhost:8081";
 
 // nickname = prompt('Введите никнем');	
 
@@ -64,8 +64,10 @@ $(document).ready(function () {
 		});
 	}, 10000);
 
-	$('#form_create_room').on('submit', function (e) {
+	$(document).on('submit', '#form_create_room', function (e) {
 		e.preventDefault()
+
+		nickname = $('#nickname_field').val();
 
 		$current = $(this);
 
@@ -105,11 +107,66 @@ $(document).ready(function () {
 
 		ws.onopen = function () {
 			ws.send(JSON.stringify({nickname: nickname}))
-			alert(1)
+			
+			renderChat();
 		}
 
 		ws.onerror = function () {
 			alert('error');
 		}	
+		
+		//Event that send message
+		$(document).on('submit', '#form-send-message', function (e) {		
+			e.preventDefault();
+
+			ws.send()
+		});
 	});
 })
+
+function renderChat() {
+	users = ["user1", "user2"];
+
+	// $.get(host + "/room/users/" + room, nil, function (data) {
+	// 	users = data;
+	// });
+
+	// $divMain = $('<div>');
+
+	// $leftDiv = $('<div>')
+	// $rightDiv = $('<div>')
+
+	// $ul = $('<ul id="users">');
+
+	// for (key in users) {
+	// 	$li = $('<li>').val(users[key]);
+	// 	$ul.append($li);
+	// }
+
+	// $rightDiv.append($ul);
+
+	// $divMain.append($leftDiv + $rightDiv);
+
+	// console.log($divMain)
+
+	// $('body > .container').append($divMain);
+
+
+	html = '<div class="col-md-12"><div class="page-header"></div>';
+
+	html += "<div class='col-md-8'><div class='col-md-12'></div><div class='col-md-12'><form id='form-send-message'><div><textarea></textarea></div><div><button type='submit' class='btn btn-success'>Отправить</button></div></form></div></div>"
+
+	html += "<div id='users' class='col-md-4'><ul>"
+
+	ul = "";
+
+	for (key in users) {
+		ul += '<li>' + users[key] + '</li>';
+	}
+
+	html += ul + "</ul>";
+
+	html += "</div></div>";
+
+	$('body > .container').html(html);
+}
