@@ -127,23 +127,68 @@ $(document).ready(function () {
 function renderChat() {
 	users = ["user1", "user2"];
 
+	someTestMessages = [{nickname: v1per14, message: 'Hello world'}, {nickname: 'Vasya', message: 'Hello my friend'}]
+
 	$.get(host + "/room/users/" + room, null, function (data) {
 		users = data;
 	});
 
-	$divMain = $('<div>');
+	$divMain = $('<div>')
+					.addClass('col-md-12');
+	$pageHeaderDiv = $('<div>')
+						.addClass('page-header')
+						.appendTo($divMain);
 
 	$leftDiv = $('<div>')
-		.addClass('')
-		.appendTo($divMain);
+					.addClass('col-md-8');
+
+	$leftDivMessageContent = $('<div>')
+								.addClass('col-md-12')
+
+	$ulMessages = $('<ul>');
+
+	for (key in someTestMessages) {
+		$liMessage = $('<li>');
+	}
+
+	$leftDivMessageContent.appendTo($leftDiv);
+
+	$leftDivMessageFormContent	= $('<div>')
+									.addClass('col-md-12')
+
+	$leftDivMessageForm = $('<form>')
+								
+
+	$textareaDiv = $('<div>')
+						.addClass('col-md-8')
+						.addClass('form-group')
+						.append('<textarea class="col-md-12 form-control">')
+						.appendTo($leftDivMessageForm);
+
+	$buttonDiv = $('<div>')
+						.addClass('col-md-4')
+						.addClass('form-group');
+
+	$buttonSendMessage = $('<button type="submit">')
+								.text('Send message')
+								.addClass('btn btn-success')
+								.appendTo($buttonDiv);
+
+	$buttonDiv.appendTo($leftDivMessageForm)							
+	$leftDivMessageForm.appendTo($leftDivMessageContent);
+
+	$leftDivMessageFormContent.appendTo($leftDiv);
+
+	$leftDiv.appendTo($divMain);
 	$rightDiv = $('<div>')
+		.addClass('col-md-4')
 		.appendTo($divMain);
 
 	$ul = $('<ul id="users">');
 
 	for (key in users) {
-		$li = $('<li>').val(users[key]);
-		$ul.append($li);
+		$li = $('<li>').text(users[key]);
+		$li.appendTo($ul);
 	}
 
 	$rightDiv.append($ul);
@@ -154,7 +199,7 @@ function renderChat() {
 
 	console.log($divMain)
 
-	$('body > .container').append($divMain);
+	$('body > .container').html($divMain);
 
 
 	// html = '<div class="col-md-12"><div class="page-header"></div>';

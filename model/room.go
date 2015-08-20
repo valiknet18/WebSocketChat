@@ -1,3 +1,5 @@
+//TODO Make struct for json result
+
 package model
 
 import (
