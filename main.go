@@ -2,13 +2,14 @@ package main
 
 import (
 	"flag"
+	"github.com/julienschmidt/httprouter"
 	"github.com/valiknet18/WebSocketChat/model"
 	"log"
 	"net/http"
 	"text/template"
 )
 
-func serveHome(w http.ResponseWriter, r *http.Request) {
+func serveHome(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if r.URL.Path == "/static/js/app.js" {
 		http.ServeFile(w, r, "static/js/app.js")
 
@@ -34,15 +35,25 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	//TODO user httproute package
+	r := httprouter.New()
+
+	r.GET("/", serveHome)
+	r.POST("/ws/:user/connect", model.ConnectToRoom)
+	r.POST("/room/create", model.CreateRoom)
+	r.GET("/room/get", model.GetRooms)
+	r.POST("/user/connect", model.ConnectUser)
+
 	flag.Parse()
 
-	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/room/create", model.CreateRoom)
-	http.HandleFunc("/room/", model.ConnectToRoom)
-	http.HandleFunc("/room/get", model.GetRooms)
+	// http.HandleFunc("/", serveHome)
+	// http.HandleFunc("/room/create", model.CreateRoom)
+	// http.HandleFunc("/room/", model.ConnectToRoom)
+	// http.HandleFunc("/room/get", model.GetRooms)
+	// http.HandleFunc("/user/connect", model.ConnectUser)
 	// http.Handle("/ws/:room", model.sendMessage)
 
-	err := http.ListenAndServe(":8081", nil)
+	err := http.ListenAndServe(":8081", r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

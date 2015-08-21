@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/gorilla/websocket"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"time"
 )
@@ -9,6 +10,7 @@ import (
 type User struct {
 	nickname string
 	ws       *websocket.Conn
+	roomHash string
 }
 
 const (
@@ -75,10 +77,18 @@ func (u *User) writePump() {
 	// }
 }
 
-func SendMessage(rw http.ResponseWriter, req *http.Request) {
-
+func SendMessage(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 }
 
-func SonnectUser(rw http.ResponseWriter, req *http.Request) {
+func ConnectUser(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	req.ParseForm()
 
+	userHash := randString(20)
+
+	hash := []byte(userHash)
+
+	users[userHash] = &User{nickname: req.Form["nickname"][0], ws: new(websocket.Conn), roomHash: req.Form["roomHash"][0]}
+
+	rw.Header().Set("Content-type", "plain/text")
+	rw.Write(hash)
 }

@@ -1,4 +1,4 @@
-var nickname = "v1per14";
+var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null};
 var channel = "";
 var host = "http://localhost:8081";
 
@@ -96,18 +96,24 @@ $(document).ready(function () {
 
 	$('#form_connect_to_room').on('submit', function (e) {
 		e.preventDefault()
+		//ALGO
+		//User write nickname, script send this nickname on server, generate user "object", and return hash (user_key), this hash save in variable, and send him with ws every time, when websocket will send.
 
 		clearInterval(interval)
 
-		$current = $(this)
+		$current = $(this);
 
-		data = $current.serialize();
+		data = $current.serializeArray();
 
-		var ws = new WebSocket('ws://localhost:8081/room/' + room);
+
+		$.post(host + "/user/connect", {nickname: data[0]['value'], roomHash: room}, function (returnedData) {
+			user.nickname = data[0]['value'];
+			user.userHash = returnedData
+		})
+
+		var ws = new WebSocket('ws://localhost:8081/room/' + user.userHash);
 
 		ws.onopen = function () {
-			ws.send(JSON.stringify({nickname: nickname}))
-			
 			renderChat();
 		}
 
@@ -127,7 +133,7 @@ $(document).ready(function () {
 function renderChat() {
 	users = ["user1", "user2"];
 
-	someTestMessages = [{nickname: v1per14, message: 'Hello world'}, {nickname: 'Vasya', message: 'Hello my friend'}]
+	someTestMessages = [{nickname: 'v1per14', message: 'Hello world'}, {nickname: 'Vasya', message: 'Hello my friend'}]
 
 	$.get(host + "/room/users/" + room, null, function (data) {
 		users = data;
@@ -148,8 +154,12 @@ function renderChat() {
 	$ulMessages = $('<ul>');
 
 	for (key in someTestMessages) {
-		$liMessage = $('<li>');
+		$liMessage = $('<li>')
+						.text(someTestMessages[key].nickname + ": " + someTestMessages[key].message)
+						.appendTo($ulMessages);
 	}
+
+	$ulMessages.appendTo($leftDivMessageContent);
 
 	$leftDivMessageContent.appendTo($leftDiv);
 

@@ -7,11 +7,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 )
 
 var rooms = make(map[string]*Room)
+var users = make(map[string]*User)
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -56,7 +58,7 @@ func (r *Room) run() {
 	}
 }
 
-func GetRooms(rw http.ResponseWriter, req *http.Request) {
+func GetRooms(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	json, err := json.Marshal(rooms)
 
 	if err != nil {
@@ -67,7 +69,7 @@ func GetRooms(rw http.ResponseWriter, req *http.Request) {
 	rw.Write(json)
 }
 
-func ConnectToRoom(rw http.ResponseWriter, req *http.Request) {
+func ConnectToRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	ws, err := upgrader.Upgrade(rw, req, nil)
 
 	if err != nil {
@@ -78,15 +80,8 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request) {
 
 	_, message, _ := ws.ReadMessage()
 
-	var dat map[string]string
-
-	json.Unmarshal(message, &dat)
-
-	log.Println(dat["nickname"])
-
-	u := &User{nickname: dat["nickname"], ws: ws}
-
-	u.readPump()
+	log.Println(req)
+	log.Println(message)
 
 	// h.register <- c
 	// go c.writePump()
@@ -102,7 +97,7 @@ func print_binary(s []byte) {
 }
 
 //TODO fix this =)
-func CreateRoom(rw http.ResponseWriter, req *http.Request) {
+func CreateRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	req.ParseForm()
 
 	if req.Method == "POST" {
