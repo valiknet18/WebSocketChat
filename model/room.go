@@ -25,35 +25,33 @@ type Room struct {
 	Name       string           `json:"name"`
 	Register   chan *User       `json:"-"`
 	Unregister chan *User       `json:"-"`
-	Broadcast  chan string      `json:"-"`
+	Broadcast  chan []byte      `json:"-"`
 	RoomHash   string           `json:"hash"`
 }
 
 func (r *Room) joinToRoom(user *User) {
-	r.Users[user.nickname] = user
+	r.Users[user.Nickname] = user
 }
 
 func (r *Room) leaveFromRoom(user *User) {
-	delete(r.Users, user.nickname)
+	delete(r.Users, user.Nickname)
 }
 
 func (r *Room) run() {
 	for {
 		select {
-		case u := <-r.Register:
-			r.Users[u.nickname] = u
-		case u := <-r.Unregister:
-			delete(r.Users, u.nickname)
-			// case m := <-r.Broadcast:
-			// 	for _, user := range r.Users {
-			// 		select {
-			// 		case user.message <- m:
-			// 		default:
-			// 			close(user.message)
-			// 			delete(r.Users, user.nickname)
-			// 		}
-			// 	}
-			// }
+		case m := <-r.Broadcast:
+			{
+				for _, u := range r.Users {
+					select {
+					case u.Send <- m:
+					default:
+						{
+							close(u.Send)
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -69,7 +67,7 @@ func GetRooms(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	rw.Write(json)
 }
 
-func ConnectToRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ws, err := upgrader.Upgrade(rw, req, nil)
 
 	if err != nil {
@@ -82,6 +80,14 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Param
 
 	log.Println(req)
 	log.Println(message)
+
+	userHash := params.ByName("userHash")
+
+	user := users[userHash]
+
+	go user.writePump()
+
+	user.readPump()
 
 	// h.register <- c
 	// go c.writePump()
@@ -109,8 +115,9 @@ func CreateRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 			Name:       req.Form["room"][0],
 			Register:   make(chan *User),
 			Unregister: make(chan *User),
-			Broadcast:  make(chan string),
+			Broadcast:  make(chan []byte),
 			RoomHash:   rb,
+			Users:      make(map[string]*User),
 		}
 
 		go room.run()
@@ -136,4 +143,17 @@ func randString(n int) string {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
 	}
 	return string(bytes)
+}
+
+func GetRoomUsers(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	hash := params.ByName("roomHash")
+
+	js, err := json.Marshal(rooms[hash])
+
+	if err != nil {
+		log.Println(err.Error)
+	}
+
+	rw.Header().Set("Content-type", "application/json")
+	rw.Write(js)
 }

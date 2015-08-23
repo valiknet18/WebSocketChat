@@ -1,12 +1,11 @@
-var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null};
-var channel = "";
+var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null, roomHash: null};
 var host = "http://localhost:8081";
 
 // nickname = prompt('Введите никнем');	
 
 $(document).ready(function () {
 	
-
+	//Выбор канала (подсвечивает выбраный)
 	$(document).on('click', 'ul.rooms-list li', function () {
 
 		$('ul.rooms-list li').removeClass('active');
@@ -17,14 +16,15 @@ $(document).ready(function () {
 
 		$('#form_connect_to_room #channel_message').html('Вы выбрали канал <b>' + $current.text() + '</b>')
 		$('#form_connect_to_room #room_field').val($current.data('value'))
-		channel = $current.data('value');
+		user.roomHash = $current.data('value');
 	});
 
+	//Вытягивает комнаты
 	$.get(host + '/room/get', null, function (data) {
 		result = "";
 
 		for (room in data) {
-			if (data[room].hash == channel) {
+			if (data[room].hash == user.roomHash) {
 				result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
 			} else {
 				result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
@@ -49,7 +49,7 @@ $(document).ready(function () {
 			result = "";
 				
 			for (room in data) {
-				if (data[room].hash == channel) {
+				if (data[room].hash == user.roomHash) {
 					result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
 				} else {
 					result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
@@ -64,6 +64,7 @@ $(document).ready(function () {
 		});
 	}, 10000);
 
+	//Форма для создания канала
 	$(document).on('submit', '#form_create_room', function (e) {
 		e.preventDefault()
 
@@ -77,7 +78,7 @@ $(document).ready(function () {
 			result = "";
 				
 			for (room in data) {
-				if (data[room].hash == channel) {
+				if (data[room].hash == user.roomHash) {
 					result += '<li data-value="' + data[room].hash + '" class="active">' + data[room].name + '</li>'
 				} else {
 					result += '<li data-value="' + data[room].hash + '">' + data[room].name + '</li>'	
@@ -94,6 +95,7 @@ $(document).ready(function () {
 		})
 	});	
 
+	//Форма которая подключается к комнате
 	$('#form_connect_to_room').on('submit', function (e) {
 		e.preventDefault()
 		//ALGO
@@ -105,37 +107,54 @@ $(document).ready(function () {
 
 		data = $current.serializeArray();
 
+		console.log(data)
 
-		$.post(host + "/user/connect", {nickname: data[0]['value'], roomHash: room}, function (returnedData) {
-			user.nickname = data[0]['value'];
-			user.userHash = returnedData
-		})
+		if ($('ul li.active').length) {
+			var ws;
 
-		var ws = new WebSocket('ws://localhost:8081/room/' + user.userHash);
+			$.post(host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
+				user.nickname = data[0]['value'];
+				user.userHash = returnedData
 
-		ws.onopen = function () {
-			renderChat();
+				ws = new WebSocket('ws://localhost:8081/ws/' + user.userHash + '/connect');
+
+				ws.onopen = function () {
+					renderChat();
+				}
+
+				ws.onerror = function () {
+					alert('error');
+				}
+
+				ws.onmessage = function (data) {
+					console.log(data)
+				}
+			});
+				
+			
+			//Event that send message
+			$(document).on('submit', '#formSendMessage', function (e) {		
+				e.preventDefault();
+
+				data = $(this).serializeArray()
+
+				console.log(data)
+
+				ws.send({userHash: users.userHash, message: data[0]['value']});
+			});	
+		} else {
+			alert('Нужно выбрать комнату')
 		}
-
-		ws.onerror = function () {
-			alert('error');
-		}	
-		
-		//Event that send message
-		$(document).on('submit', '#form-send-message', function (e) {		
-			e.preventDefault();
-
-			ws.send()
-		});
 	});
 })
 
+//Рендерит чат
 function renderChat() {
 	users = ["user1", "user2"];
 
 	someTestMessages = [{nickname: 'v1per14', message: 'Hello world'}, {nickname: 'Vasya', message: 'Hello my friend'}]
 
-	$.get(host + "/room/users/" + room, null, function (data) {
+	$.get(host + "/room/users/" + user.roomHash, null, function (data) {
 		users = data;
 	});
 
@@ -166,13 +185,13 @@ function renderChat() {
 	$leftDivMessageFormContent	= $('<div>')
 									.addClass('col-md-12')
 
-	$leftDivMessageForm = $('<form>')
+	$leftDivMessageForm = $('<form id="formSendMessage">')
 								
 
 	$textareaDiv = $('<div>')
 						.addClass('col-md-8')
 						.addClass('form-group')
-						.append('<textarea class="col-md-12 form-control">')
+						.append('<textarea class="col-md-12 form-control" name="message">')
 						.appendTo($leftDivMessageForm);
 
 	$buttonDiv = $('<div>')

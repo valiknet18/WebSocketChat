@@ -38,10 +38,11 @@ func main() {
 	//TODO user httproute package
 	r := httprouter.New()
 
+	r.GET("/ws/:userHash/connect", model.ConnectToRoom)
 	r.GET("/", serveHome)
-	r.POST("/ws/:user/connect", model.ConnectToRoom)
 	r.POST("/room/create", model.CreateRoom)
 	r.GET("/room/get", model.GetRooms)
+	r.GET("/room/users/:roomHash", model.GetRoomUsers)
 	r.POST("/user/connect", model.ConnectUser)
 
 	r.ServeFiles("/static/*filepath", http.Dir("./static/"))
