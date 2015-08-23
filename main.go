@@ -44,6 +44,8 @@ func main() {
 	r.GET("/room/get", model.GetRooms)
 	r.POST("/user/connect", model.ConnectUser)
 
+	r.ServeFiles("/static/*filepath", http.Dir("./static/"))
+
 	flag.Parse()
 
 	// http.HandleFunc("/", serveHome)
