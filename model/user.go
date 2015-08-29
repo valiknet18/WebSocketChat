@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/julienschmidt/httprouter"
@@ -14,6 +15,16 @@ type User struct {
 	Ws       *websocket.Conn `json:"-"`
 	RoomHash string          `json:"roomHash"`
 	Send     chan []byte     `json:"-"`
+}
+
+type ReturnMessage struct {
+	UserHash string
+	Message  string
+}
+
+type SendMessage struct {
+	User    *User  `json:"user"`
+	Message string `json:"message"`
 }
 
 const (
@@ -53,13 +64,21 @@ func (u *User) readPump() {
 			break
 		}
 
+		js := new(ReturnMessage)
+
+		err = json.Unmarshal(message, &js)
+
+		msg := SendMessage{User: users[js.UserHash], Message: js.Message}
+
+		message, err = json.Marshal(msg)
+
 		rooms[u.RoomHash].Broadcast <- message
 	}
 }
 
 // write writes a message with the given message type and payload.
 func (u *User) write(mt int, payload []byte) error {
-	fmt.Println(string(payload))
+	// fmt.Println(string(payload))
 
 	u.Ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return u.Ws.WriteMessage(mt, payload)
@@ -97,8 +116,8 @@ func (u *User) writePump() {
 	}
 }
 
-func SendMessage(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-}
+// func SendMessage(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+// }
 
 func ConnectUser(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	req.ParseForm()

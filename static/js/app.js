@@ -120,14 +120,16 @@ $(document).ready(function () {
 
 				ws.onopen = function () {
 					renderChat();
+
+					ws.send('Hello world')
 				}
 
 				ws.onerror = function () {
 					alert('error');
 				}
 
-				ws.onmessage = function (data) {
-					console.log(data.data)
+				ws.onmessage = function (event) {
+					renderMessage(event.data)
 				}
 			});
 				
@@ -138,9 +140,13 @@ $(document).ready(function () {
 
 				data = $(this).serializeArray()
 
-				console.log(data)
+				obj = {UserHash: user.userHash, Message: data[0]['value']}
 
-				ws.send({userHash: users.userHash, message: data[0]['value']});
+				json = JSON.stringify(obj)	
+
+				ws.send(json);
+
+				$('#formSendMessage textarea').val("")
 			});	
 		} else {
 			alert('Нужно выбрать комнату')
@@ -148,15 +154,46 @@ $(document).ready(function () {
 	});
 })
 
+function renderMessage (data) {
+	userInfo = JSON.parse(data)
+
+	var $mainLi = $('<li>')
+
+	$('<div>')
+		.html(userInfo.user.nickname + ": <b>" + userInfo.message + "</b>")
+		.appendTo($mainLi);
+
+
+	$('#messageContent ul').prepend($mainLi)
+}
+
 //Рендерит чат
 function renderChat() {
-	users = ["user1", "user2"];
-
-	someTestMessages = [{nickname: 'v1per14', message: 'Hello world'}, {nickname: 'Vasya', message: 'Hello my friend'}]
+	users = [];
 
 	$.get(host + "/room/users/" + user.roomHash, null, function (data) {
 		users = data;
+
+		$('#users').html('')
+
+		for (key in users.users) {
+			$li = $('<li>').text(users.users[key].nickname);
+			$li.appendTo($ul);
+		}
 	});
+
+	setInterval(function () {
+		$.get(host + "/room/users/" + user.roomHash, null, function (data) {
+			users = data;
+
+			$('#users').html('')
+
+			for (key in users.users) {
+				$li = $('<li>').text(users.users[key].nickname);
+				$li.appendTo($ul);
+			}
+		});
+	}, 3000)
 
 	$divMain = $('<div>')
 					.addClass('col-md-12');
@@ -167,16 +204,16 @@ function renderChat() {
 	$leftDiv = $('<div>')
 					.addClass('col-md-8');
 
-	$leftDivMessageContent = $('<div>')
+	$leftDivMessageContent = $('<div id="messageContent">')
 								.addClass('col-md-12')
 
 	$ulMessages = $('<ul>');
 
-	for (key in someTestMessages) {
-		$liMessage = $('<li>')
-						.text(someTestMessages[key].nickname + ": " + someTestMessages[key].message)
-						.appendTo($ulMessages);
-	}
+	// for (key in someTestMessages) {
+	// 	$liMessage = $('<li>')
+	// 					.text(someTestMessages[key].nickname + ": " + someTestMessages[key].message)
+	// 					.appendTo($ulMessages);
+	// }
 
 	$ulMessages.appendTo($leftDivMessageContent);
 
@@ -214,11 +251,6 @@ function renderChat() {
 		.appendTo($divMain);
 
 	$ul = $('<ul id="users">');
-
-	for (key in users) {
-		$li = $('<li>').text(users[key]);
-		$li.appendTo($ul);
-	}
 
 	$rightDiv.append($ul);
 
