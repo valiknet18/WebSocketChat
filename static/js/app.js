@@ -127,7 +127,7 @@ $(document).ready(function () {
 				}
 
 				ws.onmessage = function (data) {
-					console.log(data)
+					console.log(data.data)
 				}
 			});
 				

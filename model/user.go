@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -30,10 +31,16 @@ const (
 )
 
 func (u *User) readPump() {
-	defer func() {
-		// u.unregister <- c
-		u.Ws.Close()
-	}()
+	// log.Println("In user read pump")
+
+	// defer func() {
+	// 	// u.unregister <- c
+	// 	u.Ws.Close()
+	// }()
+
+	defer u.Ws.Close()
+
+	fmt.Println(u.Ws)
 
 	u.Ws.SetReadLimit(maxMessageSize)
 	u.Ws.SetReadDeadline(time.Now().Add(pongWait))
@@ -52,6 +59,8 @@ func (u *User) readPump() {
 
 // write writes a message with the given message type and payload.
 func (u *User) write(mt int, payload []byte) error {
+	fmt.Println(string(payload))
+
 	u.Ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return u.Ws.WriteMessage(mt, payload)
 }

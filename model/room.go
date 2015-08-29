@@ -85,13 +85,11 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.
 
 	user := users[userHash]
 
+	user.Ws = ws
+
 	go user.writePump()
 
 	user.readPump()
-
-	// h.register <- c
-	// go c.writePump()
-	// c.readPump()
 }
 
 func print_binary(s []byte) {
