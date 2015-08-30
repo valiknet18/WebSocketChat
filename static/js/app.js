@@ -116,11 +116,9 @@ $(document).ready(function () {
 
 		data = $current.serializeArray();
 
-		$current.remove();
-
-		console.log(data)
-
 		if ($('ul li.active').length) {
+			$current.remove();
+
 			var ws;
 
 			$.post(domain + host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
