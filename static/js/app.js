@@ -1,14 +1,14 @@
 var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null, roomHash: null};
 
 // local host
-var domain = "http://"
-var host = "localhost:8080";
-var wsDomain = "ws://"
+// var domain = "http://"
+// var host = "localhost:8080";
+// var wsDomain = "ws://"
 
 // prod host
-// var domain = "https://"
-// var host = "go-test-app-project.herokuapp.com";
-// var wsDomain = "wss://"
+var domain = "https://"
+var host = "go-test-app-project.herokuapp.com";
+var wsDomain = "wss://"
 
 // nickname = prompt('Введите никнем');	
 
