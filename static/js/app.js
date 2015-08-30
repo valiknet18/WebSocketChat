@@ -116,7 +116,7 @@ $(document).ready(function () {
 				user.nickname = data[0]['value'];
 				user.userHash = returnedData
 
-				ws = new WebSocket('ws:// ' + host + ' /ws/' + user.userHash + '/connect');
+				ws = new WebSocket('ws://' + host + ' /ws/' + user.userHash + '/connect');
 
 				ws.onopen = function () {
 					renderChat();
