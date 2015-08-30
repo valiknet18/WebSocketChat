@@ -12,6 +12,7 @@
 	height: 100px;
 }
 
+
 .rooms-list > li {
 	padding: 3px;
 	padding-left: 150px;
@@ -21,4 +22,18 @@
 .rooms-list > .active {
 	background-color: #FC0404;
 	color: #ffffff;
+}
+
+#messageContent {
+	border: 1px dashed #DADADA;
+}
+
+#messageContent ul{
+	height: 400px;
+	overflow: auto;
+	border: 1px dashed #B8B1B1
+}
+
+#messageContent ul li {
+	list-style: none;
 }

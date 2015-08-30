@@ -50,14 +50,8 @@ func main() {
 
 	flag.Parse()
 
-	// http.HandleFunc("/", serveHome)
-	// http.HandleFunc("/room/create", model.CreateRoom)
-	// http.HandleFunc("/room/", model.ConnectToRoom)
-	// http.HandleFunc("/room/get", model.GetRooms)
-	// http.HandleFunc("/user/connect", model.ConnectUser)
-	// http.Handle("/ws/:room", model.sendMessage)
-
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), r)
+
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

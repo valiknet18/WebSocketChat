@@ -1,5 +1,14 @@
 var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null, roomHash: null};
-var host = "go-test-app-project.herokuapp.com";
+
+// local host
+var domain = "http://"
+var host = "localhost:8080";
+var wsDomain = "ws://"
+
+// prod host
+// var domain = "https://"
+// var host = "go-test-app-project.herokuapp.com";
+// var wsDomain = "wss://"
 
 // nickname = prompt('Введите никнем');	
 
@@ -20,7 +29,7 @@ $(document).ready(function () {
 	});
 
 	//Вытягивает комнаты
-	$.get('https://' + host + '/room/get', null, function (data) {
+	$.get(domain + host + '/room/get', null, function (data) {
 		result = "";
 
 		for (room in data) {
@@ -45,7 +54,7 @@ $(document).ready(function () {
 	});
 
 	interval = setInterval(function() {
-		$.get('https://' + host + '/room/get', null, function (data) {
+		$.get(domain + host + '/room/get', null, function (data) {
 			result = "";
 				
 			for (room in data) {
@@ -74,7 +83,7 @@ $(document).ready(function () {
 
 		data = $current.serialize();
 
-		$.post('https://' + host + "/room/create", data, function (data) {
+		$.post(domain + host + "/room/create", data, function (data) {
 			result = "";
 				
 			for (room in data) {
@@ -112,23 +121,26 @@ $(document).ready(function () {
 		if ($('ul li.active').length) {
 			var ws;
 
-			$.post('https://' + host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
+			$.post(domain + host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
 				user.nickname = data[0]['value'];
 				user.userHash = returnedData
 
-				ws = new WebSocket('wss://' + host + '/ws/' + user.userHash + '/connect');
+				ws = new WebSocket(wsDomain + host + '/ws/' + user.userHash + '/connect');
 
 				ws.onopen = function () {
-					renderChat();
+					console.log("Соединение установлено")
 
+					renderChat();
 					ws.send('Hello world')
 				}
 
 				ws.onerror = function () {
-					alert('error');
+					console.log("Соединение разорвано")
 				}
 
 				ws.onmessage = function (event) {
+					console.log(event.data)
+
 					renderMessage(event.data)
 				}
 			});
@@ -140,13 +152,17 @@ $(document).ready(function () {
 
 				data = $(this).serializeArray()
 
-				obj = {UserHash: user.userHash, Message: data[0]['value']}
+				if (data[0]['value']) {
+					obj = {UserHash: user.userHash, Message: data[0]['value']}
 
-				json = JSON.stringify(obj)	
+					json = JSON.stringify(obj)	
 
-				ws.send(json);
-
-				$('#formSendMessage textarea').val("")
+					ws.send(json);	
+					
+					$('#formSendMessage textarea').val("")
+				} else {
+					alert("Нужно ввести сообщение")
+				}
 			});	
 		} else {
 			alert('Нужно выбрать комнату')
@@ -159,19 +175,27 @@ function renderMessage (data) {
 
 	var $mainLi = $('<li>')
 
-	$('<div>')
-		.html(userInfo.user.nickname + ": <b>" + userInfo.message + "</b>")
-		.appendTo($mainLi);
+	$message = $('<div class="col-md-12">')
+
+	$messageText = $('<div class="col-md-8">')
+		.html("<b>" + userInfo.user.nickname  + "</b>: " + userInfo.message)
+		.appendTo($message)
+
+	$messageDate = $('<div class="col-md-4">')
+		.html("<span class='pull-right'>" + userInfo.created_at + "</span>")
+		.appendTo($message)
+
+	$message.appendTo($mainLi);
 
 
-	$('#messageContent ul').prepend($mainLi)
+	$('#messageContent ul').append($mainLi)
 }
 
 //Рендерит чат
 function renderChat() {
 	users = [];
 
-	$.get('https://' + host + "/room/users/" + user.roomHash, null, function (data) {
+	$.get(domain + host + "/room/users/" + user.roomHash, null, function (data) {
 		users = data;
 
 		$('#users').html('')
@@ -183,7 +207,7 @@ function renderChat() {
 	});
 
 	setInterval(function () {
-		$.get('https://' + host + "/room/users/" + user.roomHash, null, function (data) {
+		$.get(domain + host + "/room/users/" + user.roomHash, null, function (data) {
 			users = data;
 
 			$('#users').html('')
@@ -207,13 +231,7 @@ function renderChat() {
 	$leftDivMessageContent = $('<div id="messageContent">')
 								.addClass('col-md-12')
 
-	$ulMessages = $('<ul>');
-
-	// for (key in someTestMessages) {
-	// 	$liMessage = $('<li>')
-	// 					.text(someTestMessages[key].nickname + ": " + someTestMessages[key].message)
-	// 					.appendTo($ulMessages);
-	// }
+	$ulMessages = $('<ul class="col-md-12">');
 
 	$ulMessages.appendTo($leftDivMessageContent);
 
@@ -246,38 +264,21 @@ function renderChat() {
 	$leftDivMessageFormContent.appendTo($leftDiv);
 
 	$leftDiv.appendTo($divMain);
+
 	$rightDiv = $('<div>')
 		.addClass('col-md-4')
-		.appendTo($divMain);
+
+	$('<h4>')
+			.text('Список активных пользователей:')
+			.appendTo($rightDiv)
+
+	$rightDiv.appendTo($divMain);	
 
 	$ul = $('<ul id="users">');
 
 	$rightDiv.append($ul);
 
-	// $divMain
-	// 	.append($leftDiv)
-	// 	.append($rightDiv);
-
 	console.log($divMain)
 
 	$('body > .container').html($divMain);
-
-
-	// html = '<div class="col-md-12"><div class="page-header"></div>';
-
-	// html += "<div class='col-md-8'><div class='col-md-12'></div><div class='col-md-12'><form id='form-send-message'><div><textarea></textarea></div><div><button type='submit' class='btn btn-success'>Отправить</button></div></form></div></div>"
-
-	// html += "<div id='users' class='col-md-4'><ul>"
-
-	// ul = "";
-
-	// for (key in users) {
-	// 	ul += '<li>' + users[key] + '</li>';
-	// }
-
-	// html += ul + "</ul>";
-
-	// html += "</div></div>";
-
-	// $('body > .container').html(html);
 }

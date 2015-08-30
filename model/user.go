@@ -15,6 +15,7 @@ type User struct {
 	Ws       *websocket.Conn `json:"-"`
 	RoomHash string          `json:"roomHash"`
 	Send     chan []byte     `json:"-"`
+	UserHash string          `json:"-"`
 }
 
 const (
@@ -35,13 +36,11 @@ func (u *User) readPump() {
 	// log.Println("In user read pump")
 
 	defer func() {
-		// u.unregister <- c
+		rooms[u.RoomHash].Unregister <- u
 		u.Ws.Close()
+		delete(rooms[u.RoomHash].Users, u.UserHash)
+		delete(users, u.UserHash)
 	}()
-
-	// defer u.Ws.Close()
-
-	fmt.Println(u.Ws)
 
 	u.Ws.SetReadLimit(maxMessageSize)
 	u.Ws.SetReadDeadline(time.Now().Add(pongWait))
@@ -58,8 +57,10 @@ func (u *User) readPump() {
 
 		err = json.Unmarshal(message, &js)
 
-		msg := SendMessage{User: users[js.UserHash], Message: js.Message}
+		t := time.Now()
+		currentTime := t.Format("02-01-2006 15:04:05")
 
+		msg := SendMessage{User: users[js.UserHash], Message: js.Message, Time: currentTime}
 		message, err = json.Marshal(msg)
 
 		rooms[u.RoomHash].Broadcast <- message
@@ -68,9 +69,8 @@ func (u *User) readPump() {
 
 // write writes a message with the given message type and payload.
 func (u *User) write(mt int, payload []byte) error {
-	// fmt.Println(string(payload))
-
 	u.Ws.SetWriteDeadline(time.Now().Add(writeWait))
+
 	return u.Ws.WriteMessage(mt, payload)
 }
 
@@ -81,6 +81,8 @@ func (u *User) writePump() {
 	defer func() {
 		ticker.Stop()
 		u.Ws.Close()
+		delete(rooms[u.RoomHash].Users, u.UserHash)
+		delete(users, u.UserHash)
 	}()
 
 	for {
@@ -115,7 +117,7 @@ func ConnectUser(rw http.ResponseWriter, req *http.Request, _ httprouter.Params)
 	userHash := randString(20)
 	hash := []byte(userHash)
 
-	user := &User{Nickname: req.Form["nickname"][0], Ws: new(websocket.Conn), RoomHash: req.Form["roomHash"][0], Send: make(chan []byte)}
+	user := &User{Nickname: req.Form["nickname"][0], Ws: new(websocket.Conn), RoomHash: req.Form["roomHash"][0], Send: make(chan []byte), UserHash: userHash}
 
 	// log.Println("Room hash" + string(req.Form["roomHash"][0]))
 
@@ -124,6 +126,28 @@ func ConnectUser(rw http.ResponseWriter, req *http.Request, _ httprouter.Params)
 	log.Println(rooms[req.Form["roomHash"][0]].Users[userHash])
 	rooms[req.Form["roomHash"][0]].Users[userHash] = user
 
+	rooms[req.Form["roomHash"][0]].Register <- user
+
 	rw.Header().Set("Content-type", "plain/text")
 	rw.Write(hash)
+}
+
+func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	ws, err := upgrader.Upgrade(rw, req, nil)
+
+	if err != nil {
+		return
+	}
+
+	fmt.Fprint(rw, req.Form)
+
+	userHash := params.ByName("userHash")
+
+	user := users[userHash]
+
+	user.Ws = ws
+
+	go user.writePump()
+
+	user.readPump()
 }

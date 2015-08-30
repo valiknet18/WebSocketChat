@@ -10,6 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+	"time"
 )
 
 var rooms = make(map[string]*Room)
@@ -38,13 +39,57 @@ func (r *Room) leaveFromRoom(user *User) {
 }
 
 func (r *Room) run() {
+	t := time.Now()
+	currentTime := t.Format("02-01-2006 15:04:05")
+
 	for {
 		select {
+		case u := <-r.Register:
+			{
+
+				msg := SendMessage{User: u, Message: "Присоединился к комнате", Time: currentTime}
+				message, err := json.Marshal(msg)
+
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				for _, u := range r.Users {
+					fmt.Println(u.Nickname)
+
+					select {
+					case u.Send <- message:
+					}
+				}
+			}
+			// r.Users[u.UserHash] = u
+
+		case u := <-r.Unregister:
+			{
+				msg := SendMessage{User: u, Message: "Покинул комнату", Time: currentTime}
+				message, err := json.Marshal(msg)
+
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				for _, u := range r.Users {
+					fmt.Println(u.Nickname)
+
+					select {
+
+					case u.Send <- message:
+					}
+				}
+			}
+
 		case m := <-r.Broadcast:
 			{
 				for _, u := range r.Users {
 					select {
+
 					case u.Send <- m:
+
 					default:
 						{
 							close(u.Send)
@@ -65,31 +110,6 @@ func GetRooms(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	rw.Header().Set("Content-type", "application/json")
 	rw.Write(json)
-}
-
-func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	ws, err := upgrader.Upgrade(rw, req, nil)
-
-	if err != nil {
-		return
-	}
-
-	fmt.Fprint(rw, req.Form)
-
-	_, message, _ := ws.ReadMessage()
-
-	log.Println(req)
-	log.Println(message)
-
-	userHash := params.ByName("userHash")
-
-	user := users[userHash]
-
-	user.Ws = ws
-
-	go user.writePump()
-
-	user.readPump()
 }
 
 func print_binary(s []byte) {
