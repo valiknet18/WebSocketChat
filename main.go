@@ -6,6 +6,7 @@ import (
 	"github.com/valiknet18/WebSocketChat/model"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 )
 
@@ -56,7 +57,7 @@ func main() {
 	// http.HandleFunc("/user/connect", model.ConnectUser)
 	// http.Handle("/ws/:room", model.sendMessage)
 
-	err := http.ListenAndServe(":8081", r)
+	err := http.ListenAndServe(":"+os.Getenv("PORT"), r)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
