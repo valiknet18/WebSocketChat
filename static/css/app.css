@@ -29,7 +29,7 @@
 }
 
 #messageContent ul{
-	height: 400px;
+	height: 300px;
 	overflow: auto;
 	border: 1px dashed #B8B1B1
 }
@@ -37,3 +37,12 @@
 #messageContent ul li {
 	list-style: none;
 }
+
+.emojiPicker {
+	height: 150px !important
+}
+
+.emojiPicker .emotion {
+	height: 120px !important
+}
+
