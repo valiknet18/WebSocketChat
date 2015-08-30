@@ -187,8 +187,11 @@ function renderMessage (data) {
 
 	$message.appendTo($mainLi);
 
+	$messageContent = $('#messageContent ul')
+					
+	$messageContent.append($mainLi)
 
-	$('#messageContent ul').append($mainLi)
+	$messageContent.scrollTop($messageContent[0].scrollHeight - $messageContent.height());
 }
 
 //Рендерит чат
