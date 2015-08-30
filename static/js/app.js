@@ -1,5 +1,5 @@
 var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null, roomHash: null};
-var host = "http://localhost:8081";
+var host = "";
 
 // nickname = prompt('Введите никнем');	
 
