@@ -112,7 +112,7 @@ $(document).ready(function () {
 		if ($('ul li.active').length) {
 			var ws;
 
-			$.post(host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
+			$.post('https://' + host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
 				user.nickname = data[0]['value'];
 				user.userHash = returnedData
 
@@ -171,7 +171,7 @@ function renderMessage (data) {
 function renderChat() {
 	users = [];
 
-	$.get(host + "/room/users/" + user.roomHash, null, function (data) {
+	$.get('https://' + host + "/room/users/" + user.roomHash, null, function (data) {
 		users = data;
 
 		$('#users').html('')
@@ -183,7 +183,7 @@ function renderChat() {
 	});
 
 	setInterval(function () {
-		$.get(host + "/room/users/" + user.roomHash, null, function (data) {
+		$.get('https://' + host + "/room/users/" + user.roomHash, null, function (data) {
 			users = data;
 
 			$('#users').html('')
