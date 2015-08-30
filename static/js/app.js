@@ -116,6 +116,8 @@ $(document).ready(function () {
 
 		data = $current.serializeArray();
 
+		$current.remove();
+
 		console.log(data)
 
 		if ($('ul li.active').length) {
