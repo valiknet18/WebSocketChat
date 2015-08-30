@@ -20,7 +20,7 @@ $(document).ready(function () {
 	});
 
 	//Вытягивает комнаты
-	$.get(host + '/room/get', null, function (data) {
+	$.get('https://' + host + '/room/get', null, function (data) {
 		result = "";
 
 		for (room in data) {
