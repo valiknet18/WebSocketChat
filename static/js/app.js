@@ -1,5 +1,5 @@
 var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null, roomHash: null};
-var host = "";
+var host = "go-test-app-project.herokuapp.com";
 
 // nickname = prompt('Введите никнем');	
 
@@ -116,7 +116,7 @@ $(document).ready(function () {
 				user.nickname = data[0]['value'];
 				user.userHash = returnedData
 
-				ws = new WebSocket('ws://localhost:8081/ws/' + user.userHash + '/connect');
+				ws = new WebSocket('ws:// ' + host + ' /ws/' + user.userHash + '/connect');
 
 				ws.onopen = function () {
 					renderChat();
