@@ -17,16 +17,6 @@ type User struct {
 	Send     chan []byte     `json:"-"`
 }
 
-type ReturnMessage struct {
-	UserHash string
-	Message  string
-}
-
-type SendMessage struct {
-	User    *User  `json:"user"`
-	Message string `json:"message"`
-}
-
 const (
 	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
@@ -44,12 +34,12 @@ const (
 func (u *User) readPump() {
 	// log.Println("In user read pump")
 
-	// defer func() {
-	// 	// u.unregister <- c
-	// 	u.Ws.Close()
-	// }()
+	defer func() {
+		// u.unregister <- c
+		u.Ws.Close()
+	}()
 
-	defer u.Ws.Close()
+	// defer u.Ws.Close()
 
 	fmt.Println(u.Ws)
 
