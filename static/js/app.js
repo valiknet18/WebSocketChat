@@ -45,7 +45,7 @@ $(document).ready(function () {
 	});
 
 	interval = setInterval(function() {
-		$.get(host + '/room/get', null, function (data) {
+		$.get('https://' + host + '/room/get', null, function (data) {
 			result = "";
 				
 			for (room in data) {
