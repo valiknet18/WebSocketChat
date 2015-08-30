@@ -1,14 +1,14 @@
 var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null, roomHash: null};
 
 // local host
-// var domain = "http://"
-// var host = "localhost:8080";
-// var wsDomain = "ws://"
+var domain = "http://"
+var host = "localhost:8080";
+var wsDomain = "ws://"
 
 // prod host
-var domain = "https://"
-var host = "go-test-app-project.herokuapp.com";
-var wsDomain = "wss://"
+// var domain = "https://"
+// var host = "go-test-app-project.herokuapp.com";
+// var wsDomain = "wss://"
 
 // nickname = prompt('Введите никнем');	
 
@@ -192,6 +192,12 @@ function renderMessage (data) {
 	$messageContent.append($mainLi)
 
 	$messageContent.scrollTop($messageContent[0].scrollHeight - $messageContent.height());
+
+	twemoji.size = '16x16';
+
+	 // Parse the document body and
+	 // insert <img> tags in place of Unicode Emojis
+	 twemoji.parse(document.getElementById('messageContent'));	
 }
 
 //Рендерит чат
@@ -284,4 +290,9 @@ function renderChat() {
 	console.log($divMain)
 
 	$('body > .container').html($divMain);
+
+	$('#formSendMessage textarea').emojiPicker({
+		width: '150px',
+		height: '300px'
+	});
 }
