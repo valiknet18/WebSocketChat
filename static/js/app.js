@@ -74,7 +74,7 @@ $(document).ready(function () {
 
 		data = $current.serialize();
 
-		$.post( host + "/room/create", data, function (data) {
+		$.post('https://' + host + "/room/create", data, function (data) {
 			result = "";
 				
 			for (room in data) {
