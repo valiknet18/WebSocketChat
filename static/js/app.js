@@ -104,70 +104,77 @@ $(document).ready(function () {
 		})
 	});	
 
-	//Форма которая подключается к комнате
-	$('#form_connect_to_room').on('submit', function (e) {
-		e.preventDefault()
-		//ALGO
-		//User write nickname, script send this nickname on server, generate user "object", and return hash (user_key), this hash save in variable, and send him with ws every time, when websocket will send.
+	flagActive = false;
 
-		clearInterval(interval)
+	if (!flagActive) {
+		flagActive = true
 
-		$current = $(this);
+		//Форма которая подключается к комнате
+		$('#form_connect_to_room').on('submit', function (e) {
+			e.preventDefault()
+			//ALGO
+			//User write nickname, script send this nickname on server, generate user "object", and return hash (user_key), this hash save in variable, and send him with ws every time, when websocket will send.
 
-		data = $current.serializeArray();
+			clearInterval(interval)
 
-		if ($('ul li.active').length) {
-			$current.remove();
+			$current = $(this);
 
-			var ws;
+			data = $current.serializeArray();
 
-			$.post(domain + host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
-				user.nickname = data[0]['value'];
-				user.userHash = returnedData
+			if ($('ul li.active').length) {
+				$current.remove();
 
-				ws = new WebSocket(wsDomain + host + '/ws/' + user.userHash + '/connect');
+				var ws;
 
-				ws.onopen = function () {
-					console.log("Соединение установлено")
+				$.post(domain + host + "/user/connect", {nickname: data[0]['value'], roomHash: data[1]['value']}, function (returnedData) {
+					user.nickname = data[0]['value'];
+					user.userHash = returnedData
 
-					renderChat();
-					ws.send('Hello world')
-				}
+					ws = new WebSocket(wsDomain + host + '/ws/' + user.userHash + '/connect');
 
-				ws.onerror = function () {
-					console.log("Соединение разорвано")
-				}
+					ws.onopen = function () {
+						console.log("Соединение установлено")
 
-				ws.onmessage = function (event) {
-					console.log(event.data)
+						renderChat();
+						ws.send('Hello world')
+					}
 
-					renderMessage(event.data)
-				}
-			});
-				
-			
-			//Event that send message
-			$(document).on('submit', '#formSendMessage', function (e) {		
-				e.preventDefault();
+					ws.onerror = function () {
+						console.log("Соединение разорвано")
+					}
 
-				data = $(this).serializeArray()
+					ws.onmessage = function (event) {
+						console.log(event.data)
 
-				if (data[0]['value']) {
-					obj = {UserHash: user.userHash, Message: data[0]['value']}
-
-					json = JSON.stringify(obj)	
-
-					ws.send(json);	
+						renderMessage(event.data)
+					}
+				});
 					
-					$('#formSendMessage textarea').val("")
-				} else {
-					alert("Нужно ввести сообщение")
-				}
-			});	
-		} else {
-			alert('Нужно выбрать комнату')
-		}
-	});
+				
+				//Event that send message
+				$(document).on('submit', '#formSendMessage', function (e) {		
+					e.preventDefault();
+
+					data = $(this).serializeArray()
+
+					if (data[0]['value']) {
+						obj = {UserHash: user.userHash, Message: data[0]['value']}
+
+						json = JSON.stringify(obj)	
+
+						ws.send(json);	
+						
+						$('#formSendMessage textarea').val("")
+					} else {
+						alert("Нужно ввести сообщение")
+					}
+				});	
+			} else {
+				alert('Нужно выбрать комнату')
+			}
+		});
+	}
+	
 })
 
 function renderMessage (data) {
