@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"text/template"
+	"github.com/rs/cors"
 )
 
 func serveHome(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -50,7 +51,9 @@ func main() {
 
 	flag.Parse()
 
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), r)
+	handler := cors.Default().Handler(r)
+
+	err := http.ListenAndServe(":"+os.Getenv("PORT"), handler)
 
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
