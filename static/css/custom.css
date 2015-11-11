@@ -1,0 +1,21 @@
+#messages-holder {
+	height: 400px;
+	overflow: auto;
+}
+
+#chat-section {
+	margin-top: 20px;
+}
+
+#chat-section textarea {
+	resize: none;
+}
+
+#chat-section #count-chars {
+	position: relative;
+	top: -24px;
+	left: 1px;
+	background-color: #EEEEEE;
+	padding: 5px 10px;
+	border-radius: 0px 0px 0px 3px;
+}
