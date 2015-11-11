@@ -6,9 +6,9 @@ var user = {nickname: "quest" + Math.floor(Math.random() * 10), userHash: null, 
 // var wsDomain = "ws://"
 
 // prod host
-var domain = "https://"
-var host = "go-test-app-project.herokuapp.com";
-var wsDomain = "wss://"
+var domain = "http://"
+var host = "localhost:8000";
+var wsDomain = "ws://"
 
 // nickname = prompt('Введите никнем');	
 

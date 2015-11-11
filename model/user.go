@@ -139,7 +139,7 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.
 		return
 	}
 
-	fmt.Fprint(rw, req.Form)
+	// fmt.Fprint(rw, req.Form)
 
 	userHash := params.ByName("userHash")
 

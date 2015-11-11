@@ -6,7 +6,6 @@ import (
 	"github.com/valiknet18/WebSocketChat/model"
 	"log"
 	"net/http"
-	"os"
 	"text/template"
 	"github.com/rs/cors"
 )
@@ -53,11 +52,10 @@ func main() {
 
 	handler := cors.Default().Handler(r)
 
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), handler)
+	log.Println("Server running on port: 8000")
+	err := http.ListenAndServe(":8000", handler)
 
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-
-	log.Println("Server started ")
 }
