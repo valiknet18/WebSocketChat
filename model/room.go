@@ -30,14 +30,17 @@ type Room struct {
 	RoomHash   string           `json:"hash"`
 }
 
+//Присойденяет юзера к комнате
 func (r *Room) joinToRoom(user *User) {
 	r.Users[user.Nickname] = user
 }
 
+//Удаляет юзера с комнаты
 func (r *Room) leaveFromRoom(user *User) {
 	delete(r.Users, user.Nickname)
 }
 
+//Запускает комнату
 func (r *Room) run() {
 	t := time.Now()
 	currentTime := t.Format("02-01-2006 15:04:05")
@@ -101,6 +104,7 @@ func (r *Room) run() {
 	}
 }
 
+//Возвращает все комнаты
 func GetRooms(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	json, err := json.Marshal(rooms)
 
@@ -120,7 +124,7 @@ func print_binary(s []byte) {
 	fmt.Printf("\n")
 }
 
-//TODO fix this =)
+//Создает новую комнату
 func CreateRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	req.ParseForm()
 
@@ -153,6 +157,7 @@ func CreateRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 	}
 }
 
+//Рандомная строка
 func randString(n int) string {
 	const alphanum = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var bytes = make([]byte, n)
@@ -163,6 +168,7 @@ func randString(n int) string {
 	return string(bytes)
 }
 
+//Возвращает юзеров комнаты
 func GetRoomUsers(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	hash := params.ByName("roomHash")
 

@@ -26,7 +26,11 @@ func main() {
 	r := httprouter.New()
 
 	r.GET("/ws/:userHash/connect", model.ConnectToRoom)
+
 	r.GET("/", serveHome)
+
+	r.POST("/users/create", model.UserCreate)
+	
 	r.POST("/room/create", model.CreateRoom)
 	r.GET("/room/get", model.GetRooms)
 	r.GET("/room/users/:roomHash", model.GetRoomUsers)

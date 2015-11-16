@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+//Структура юзера
 type User struct {
 	Nickname string          `json:"nickname"`
 	Ws       *websocket.Conn `json:"-"`
@@ -18,6 +19,9 @@ type User struct {
 	UserHash string          `json:"-"`
 }
 
+var users User[]
+
+// Описуем константы для настройки вебсокетов
 const (
 	// Time allowed to write a message to the peer.
 	writeWait = 10 * time.Second
@@ -32,6 +36,7 @@ const (
 	maxMessageSize = 512
 )
 
+//Метод читает вебсокеты которые приходят
 func (u *User) readPump() {
 	// log.Println("In user read pump")
 
@@ -67,14 +72,14 @@ func (u *User) readPump() {
 	}
 }
 
-// write writes a message with the given message type and payload.
+// Метод записует данные в вебсокет
 func (u *User) write(mt int, payload []byte) error {
 	u.Ws.SetWriteDeadline(time.Now().Add(writeWait))
 
 	return u.Ws.WriteMessage(mt, payload)
 }
 
-// writePump pumps messages from the hub to the websocket connection.
+// Метод отлавливает по каналах сообщение, и отправляет юзерам
 func (u *User) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 
@@ -87,23 +92,23 @@ func (u *User) writePump() {
 
 	for {
 		select {
-		case message, ok := <-u.Send:
-			{
-				if !ok {
-					u.write(websocket.CloseMessage, []byte{})
+			case message, ok := <-u.Send:
+				{
+					if !ok {
+						u.write(websocket.CloseMessage, []byte{})
+					}
+
+					if err := u.write(websocket.TextMessage, message); err != nil {
+						return
+					}
 				}
 
-				if err := u.write(websocket.TextMessage, message); err != nil {
-					return
+			case <-ticker.C:
+				{
+					if err := u.write(websocket.PingMessage, []byte{}); err != nil {
+						return
+					}
 				}
-			}
-
-		case <-ticker.C:
-			{
-				if err := u.write(websocket.PingMessage, []byte{}); err != nil {
-					return
-				}
-			}
 		}
 	}
 }
@@ -112,24 +117,24 @@ func (u *User) writePump() {
 // }
 
 func ConnectUser(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	req.ParseForm()
+	// req.ParseForm()
 
-	userHash := randString(20)
-	hash := []byte(userHash)
+	// userHash := randString(20)
+	// hash := []byte(userHash)
 
-	user := &User{Nickname: req.Form["nickname"][0], Ws: new(websocket.Conn), RoomHash: req.Form["roomHash"][0], Send: make(chan []byte), UserHash: userHash}
+	// user := &User{Nickname: req.Form["nickname"][0], Ws: new(websocket.Conn), RoomHash: req.Form["roomHash"][0], Send: make(chan []byte), UserHash: userHash}
 
-	// log.Println("Room hash" + string(req.Form["roomHash"][0]))
+	// // log.Println("Room hash" + string(req.Form["roomHash"][0]))
 
-	users[userHash] = user
+	// users[userHash] = user
 
-	log.Println(rooms[req.Form["roomHash"][0]].Users[userHash])
-	rooms[req.Form["roomHash"][0]].Users[userHash] = user
+	// log.Println(rooms[req.Form["roomHash"][0]].Users[userHash])
+	// rooms[req.Form["roomHash"][0]].Users[userHash] = user
 
-	rooms[req.Form["roomHash"][0]].Register <- user
+	// rooms[req.Form["roomHash"][0]].Register <- user
 
-	rw.Header().Set("Content-type", "plain/text")
-	rw.Write(hash)
+	// rw.Header().Set("Content-type", "plain/text")
+	// rw.Write(hash)
 }
 
 func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
@@ -150,4 +155,11 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.
 	go user.writePump()
 
 	user.readPump()
+}
+
+//Функция создает юзера
+func UserCreate(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
+
+
+	append(users, user)
 }
