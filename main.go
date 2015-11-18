@@ -25,16 +25,16 @@ func main() {
 	//TODO user httproute package
 	r := httprouter.New()
 
-	r.GET("/ws/:userHash/connect", model.ConnectToRoom)
+	r.GET("/ws/:roomHash/connect/:userHash", model.ConnectToRoom)
 
 	r.GET("/", serveHome)
 
 	r.POST("/users/create", model.UserCreate)
 	
-	r.POST("/room/create", model.CreateRoom)
-	r.GET("/room/get", model.GetRooms)
-	r.GET("/room/users/:roomHash", model.GetRoomUsers)
-	r.POST("/user/connect", model.ConnectUser)
+	r.POST("/rooms/create", model.CreateRoom)
+	
+	r.GET("/rooms/get", model.GetRooms)
+	r.GET("/rooms/users/:roomHash", model.GetRoomUsers)
 
 	r.ServeFiles("/static/*filepath", http.Dir("./static/"))
 
@@ -43,7 +43,7 @@ func main() {
 	handler := cors.Default().Handler(r)
 
 	log.Println("Server running on port: 8000")
-	err := http.ListenAndServe(":8001", handler)
+	err := http.ListenAndServe(":8000", handler)
 
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

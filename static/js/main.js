@@ -1,5 +1,5 @@
 (function () {
-	var app = angular.module('chat', ['ngRoute', 'controllers', 'factories']);
+	var app = angular.module('chat', ['ngRoute', 'controllers', 'factories', 'ngWebSocket', 'LocalStorageModule']);
 
 	app.config(['$routeProvider', function ($routeProvider) {
 		$routeProvider

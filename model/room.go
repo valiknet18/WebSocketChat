@@ -14,7 +14,6 @@ import (
 )
 
 var rooms = make(map[string]*Room)
-var users = make(map[string]*User)
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,

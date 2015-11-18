@@ -21,8 +21,7 @@
 					<div class="form-group">
 						<label>Список кімнат: </label>
 						<ul class="list-group">
-							<li class="list-group-item" data-slug="1" click-room >Кімната 1</li>
-							<li class="list-group-item" data-slug="2" click-room >Кімната 2</li>
+							<li class="list-group-item" data-slug="{{ channel.RoomHash }}" click-room ng-repeat="channel in channels">{{ channel.Name }}</li>
 						</ul>
 					</div>
 					<div class="form-group">

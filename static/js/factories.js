@@ -22,4 +22,80 @@
 			});
 		}
 	});
+
+	app.factory("createUser", ['$http', '$q', function ($http, $q) {
+		var defer = $q.defer();
+
+		return function (nickname) {
+			$http
+				.post("/users/create", {nickname: nickname})
+				.then(function (response) {
+					defer.resolve(response)
+				}, function (error) {
+					defer.reject(error)
+				})
+			;
+
+			return defer.promise
+		}
+	}]);
+
+	app.factory("getRooms", ['$http', '$q', function ($http, $q) {
+		var defer = $q.defer()
+
+		return function () {
+			$http
+				.get("/rooms/get")
+				.then(function (response) {
+					defer.resolve(response)
+				}, function (error) {
+					defer.reject(error)
+				})
+			;
+
+			return defer.promise
+		}
+	}]);
+
+	app.factory("createRoom", ['$http', '$q', 'avia_host', function ($http, $q, avia_host) {
+		return function (roomName) {
+			var defer = $q.defer();
+
+			$http
+				.post(avia_host + "/rooms/create", {room: roomName})
+				.then(function (data) {
+					defer.resolve(data)
+				}, function (error) {
+					defer.reject(error)
+				})
+			;
+
+			return defer.promise
+		}
+	}]);
+
+	app.factory("connectToRoom", ['$websocket', function ($websocket) {
+
+		return function (roomHash, userHash) {
+			var dataStream = $websocket("ws://127.0.0.1:8000/ws/" + roomHash + "/connect/" + userHash);
+
+			var collection = [];
+
+			dataStream.onMessage(function (message) {
+				collection.push(message)
+			});
+
+			return {
+				collection: collection,
+				send: function (message) {
+					data = {
+						userHash: userHash,
+						message: message 
+					};
+
+					$dataStream.send(data)
+				}
+			}
+		}
+	}]);
 })();

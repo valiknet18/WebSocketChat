@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 	"time"
+	"crypto/md5"
+	"fmt"
+	"encoding/hex"
 )
 
 //Структура юзера
@@ -19,7 +20,7 @@ type User struct {
 	UserHash string          `json:"-"`
 }
 
-var users User[]
+var users = make(map[string]*User)
 
 // Описуем константы для настройки вебсокетов
 const (
@@ -113,29 +114,6 @@ func (u *User) writePump() {
 	}
 }
 
-// func SendMessage(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-// }
-
-func ConnectUser(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	// req.ParseForm()
-
-	// userHash := randString(20)
-	// hash := []byte(userHash)
-
-	// user := &User{Nickname: req.Form["nickname"][0], Ws: new(websocket.Conn), RoomHash: req.Form["roomHash"][0], Send: make(chan []byte), UserHash: userHash}
-
-	// // log.Println("Room hash" + string(req.Form["roomHash"][0]))
-
-	// users[userHash] = user
-
-	// log.Println(rooms[req.Form["roomHash"][0]].Users[userHash])
-	// rooms[req.Form["roomHash"][0]].Users[userHash] = user
-
-	// rooms[req.Form["roomHash"][0]].Register <- user
-
-	// rw.Header().Set("Content-type", "plain/text")
-	// rw.Write(hash)
-}
 
 func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
 	ws, err := upgrader.Upgrade(rw, req, nil)
@@ -144,12 +122,13 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.
 		return
 	}
 
-	// fmt.Fprint(rw, req.Form)
-
+	roomHash := params.ByName("roomHash")
 	userHash := params.ByName("userHash")
 
 	user := users[userHash]
+	room := rooms[roomHash]
 
+	room.joinToRoom(user)
 	user.Ws = ws
 
 	go user.writePump()
@@ -159,7 +138,26 @@ func ConnectToRoom(rw http.ResponseWriter, req *http.Request, params httprouter.
 
 //Функция создает юзера
 func UserCreate(rw http.ResponseWriter, req *http.Request, params httprouter.Params) {
+	req.ParseForm()
+	var salt string = "ke12"
 
+	var nickname string = req.FormValue("nickname")
 
-	append(users, user)
+	data := []byte(nickname + salt)
+	hash := md5.Sum(data)
+
+	users[string(hash[:])] = &User{Nickname: nickname}
+
+	jsStruct := struct{ Hash string } { Hash: hex.EncodeToString(hash[:]) }
+
+	js, err := json.Marshal(jsStruct)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Hash code: ", hex.EncodeToString(hash[:]))
+
+	rw.Header().Set("Content-type", "application/json")
+	rw.Write(js)	
 }

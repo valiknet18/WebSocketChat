@@ -1,7 +1,7 @@
 (function () {
 	app = angular.module('controllers', ["ngRoute"]);
 
-	app.controller('HomeCtrl', ['$scope', '$location', function ($scope, $location) {
+	app.controller('HomeCtrl', ['$scope', '$location', 'createUser', 'localStorageService', 'getRooms', function ($scope, $location, createUser, localStorageService, getRooms) {
 		$scope.user = {}
 		$scope.room = {}
 
@@ -9,14 +9,28 @@
 			if (!$scope.user.nickname) {
 				alert("Спочатку треба ввести нікнейм");
 			} else {
-				$element = angular.element("#channels-block")
+				createUser($scope.user.nickname)
+				.then(function (response) {
+					localStorageService.set("user_token", response.data.Hash)
 
-				$element.fadeIn("slow");
-				$element.removeClass("hidden");
+					$scope.channels = getRooms().then(function (response) {
+						$scope.channels = response.data;
 
-				angular.element(".list-group.list-group-item").on("click", function () {
-					console.log($(this).data("slug"));
-				})
+						$element = angular.element("#channels-block")
+
+						$element.fadeIn("slow");
+						$element.removeClass("hidden");
+
+						angular.element(".list-group.list-group-item").on("click", function () {
+							console.log($(this).data("slug"));
+						})
+					}, function (error) {
+
+					});
+
+				}, function (error) {
+					console.log("Користувач не створений")
+				});
 			}
 		}
 
@@ -42,10 +56,12 @@
 		}	
 	}]);
 
-	app.controller("RoomCtrl", ["$scope", "$routeParams", function ($scope, $routeParams) {
+	app.controller("RoomCtrl", ["$scope", "$routeParams", "connectToRoom", "localStorageService", function ($scope, $routeParams, connectToRoom, localStorageService) {
 		$scope.message = {
 			maxChars: 250,
 			currentChars: 250,
 		}
+
+		$scope.connect = connectToRoom($routeParams.slug, localStorageService.get("user_token"));
 	}]);
 })();
