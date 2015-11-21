@@ -13,7 +13,6 @@ var wsDomain = "ws://"
 // nickname = prompt('Введите никнем');	
 
 $(document).ready(function () {
-	
 	//Выбор канала (подсвечивает выбраный)
 	$(document).on('click', 'ul.rooms-list li', function () {
 
@@ -113,7 +112,7 @@ $(document).ready(function () {
 		$('#form_connect_to_room').on('submit', function (e) {
 			e.preventDefault()
 			//ALGO
-			//User write nickname, script send this nickname on server, generate user "object", and return hash (user_key), this hash save in variable, and send him with ws every time, when websocket will send.
+			//User write nickname, script send this nickname on server, generate user "object", and return hash (user_key), this hash save in variable, and send him with ws every time, when websocket will send.	
 
 			clearInterval(interval)
 
@@ -134,6 +133,16 @@ $(document).ready(function () {
 
 					ws.onopen = function () {
 						console.log("Соединение установлено")
+
+						$(document).on('keyup', function (e) {
+							if (e.keyCode == 13) {
+								if (!$('#formSendMessage textarea').val()) {
+									alert("Поле с текстом сообщения должно быть не пустое")
+								} else {
+									$('#formSendMessage button').submit();	
+								}
+							}
+						});
 
 						renderChat();
 						ws.send('Hello world')
