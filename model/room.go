@@ -129,6 +129,8 @@ func CreateRoom(rw http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 
 	if req.Method == "POST" {
 
+		fmt.Println("Name: ", req.FormValue("room"))
+
 		rb := randString(20)
 
 		//TODO fix this name

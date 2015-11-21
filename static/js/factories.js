@@ -98,4 +98,21 @@
 			}
 		}
 	}]);
+
+	app.factory("createRoom", ['$http', '$q', function ($http, $q) {
+		var defer = $q.defer();
+
+		return function (roomName) {
+			$http
+				.post("/rooms/create", {room: roomName})
+				.then(function (response) {
+					defer.resolve(response)
+				}, function (error) {
+					defer.reject(error)
+				})
+			;
+
+			return defer.promise
+		}	
+	}]);
 })();

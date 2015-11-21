@@ -1,7 +1,7 @@
 (function () {
 	app = angular.module('controllers', ["ngRoute"]);
 
-	app.controller('HomeCtrl', ['$scope', '$location', 'createUser', 'localStorageService', 'getRooms', function ($scope, $location, createUser, localStorageService, getRooms) {
+	app.controller('HomeCtrl', ['$scope', '$location', 'createUser', 'localStorageService', 'getRooms', 'createRoom', function ($scope, $location, createUser, localStorageService, getRooms, createRoom) {
 		$scope.user = {}
 		$scope.room = {}
 
@@ -49,6 +49,13 @@
 				alert("Поле назва кімнати обов’язково до заповнення!")
 			} else {
 				console.log("Created")
+				createRoom($scope.room.name)
+				.then(function () {
+
+				}, function () {
+
+				});
+
 				$element = angular.element("#myModal")
 
 				$element.modal('hide');
